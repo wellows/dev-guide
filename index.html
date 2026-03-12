@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wellows Platform — Dev Guide</title>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface-2: #1e1e1e;
+    --surface-3: #262626;
+    --border: #2a2a2a;
+    --border-hover: #3a3a3a;
+    --text: #e0e0e0;
+    --text-muted: #888;
+    --text-dim: #666;
+    --accent: #6c9eff;
+    --accent-dim: #3d6abf;
+    --green: #4ec9b0;
+    --orange: #e0985a;
+    --purple: #c792ea;
+    --red: #f07178;
+    --cyan: #89ddff;
+    --yellow: #ffcb6b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 0 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .header h1 span { color: var(--accent); }
+
+  .header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+  }
+
+  .tab {
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    transition: all 0.2s;
+    user-select: none;
+    background: transparent;
+  }
+
+  .tab:hover { color: var(--text); background: var(--surface-2); }
+
+  .tab.active {
+    color: var(--accent);
+    background: var(--bg);
+    border-color: var(--border);
+  }
+
+  /* Content */
+  .content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+    width: 100%;
+    flex: 1;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Section */
+  .section {
+    margin-bottom: 32px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-subtitle {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: 20px 0 12px;
+  }
+
+  /* Agent Cards */
+  .agent-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .agent-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .agent-card:hover { border-color: var(--border-hover); }
+
+  .agent-header {
+    padding: 16px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    user-select: none;
+  }
+
+  .agent-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .agent-info { flex: 1; min-width: 0; }
+
+  .agent-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .model-tag {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--surface-3);
+    color: var(--text-muted);
+  }
+
+  .agent-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .agent-toggle {
+    color: var(--text-dim);
+    font-size: 18px;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .agent-card.open .agent-toggle { transform: rotate(180deg); }
+
+  .agent-details {
+    display: none;
+    padding: 0 20px 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .agent-card.open .agent-details { display: block; }
+
+  .detail-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    margin-top: 12px;
+    margin-bottom: 6px;
+  }
+
+  .skill-tag {
+    display: inline-block;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: var(--surface-3);
+    color: var(--accent);
+    margin: 2px 4px 2px 0;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  .detail-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .detail-text li {
+    margin-bottom: 4px;
+    list-style: none;
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .detail-text li::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: var(--accent-dim);
+    font-family: monospace;
+  }
+
+  /* Colors for agent badges */
+  .badge-cyan { background: #1a3a4a; color: var(--cyan); }
+  .badge-green { background: #1a3a2a; color: var(--green); }
+  .badge-blue { background: #1a2a4a; color: var(--accent); }
+  .badge-purple { background: #2a1a3a; color: var(--purple); }
+  .badge-orange { background: #3a2a1a; color: var(--orange); }
+
+  /* Skill Table */
+  .skill-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .skill-table th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .skill-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .skill-table tr:hover td { background: var(--surface); }
+
+  .skill-table .name { color: var(--accent); font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; }
+  .skill-table .cmd { color: var(--green); font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; }
+  .skill-table .desc { color: var(--text-muted); }
+  .skill-table .na { color: var(--text-dim); font-style: italic; }
+
+  /* Flow Diagram */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 24px 0;
+    overflow-x: auto;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .flow-step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 20px;
+    text-align: center;
+    min-width: 130px;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: default;
+  }
+
+  .flow-step:hover {
+    border-color: var(--accent-dim);
+    transform: translateY(-2px);
+  }
+
+  .flow-step .number {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .flow-step .label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 4px;
+  }
+
+  .flow-step .sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .flow-arrow {
+    font-size: 20px;
+    color: var(--text-dim);
+    padding: 0 6px;
+    flex-shrink: 0;
+  }
+
+  /* Command Cards */
+  .cmd-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+  }
+
+  .cmd-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+  }
+
+  .cmd-card .cmd-name {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 14px;
+    color: var(--green);
+    font-weight: 600;
+  }
+
+  .cmd-card .cmd-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  /* Info boxes */
+  .info-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .info-box strong { color: var(--text); }
+
+  .info-box.green { border-left-color: var(--green); }
+  .info-box.orange { border-left-color: var(--orange); }
+
+  /* Decision table */
+  .decision-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 12px 0;
+  }
+
+  .decision-table th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .decision-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .decision-table tr:hover td { background: var(--surface); }
+
+  .yes { color: var(--green); font-weight: 600; }
+  .no { color: var(--text-dim); }
+
+  /* Prefix tags */
+  .prefix {
+    display: inline-block;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .prefix-spec { background: #1a2a3a; color: var(--accent); }
+  .prefix-impl { background: #1a3a2a; color: var(--green); }
+  .prefix-fix { background: #3a1a1a; color: var(--red); }
+  .prefix-refactor { background: #2a1a3a; color: var(--purple); }
+  .prefix-archive { background: #2a2a1a; color: var(--yellow); }
+  .prefix-chore { background: #1a2a2a; color: var(--cyan); }
+  .prefix-feat { background: #3a2a1a; color: var(--orange); }
+
+  /* Collaboration diagram */
+  .collab-diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text-muted);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .collab-diagram .hl { color: var(--accent); }
+  .collab-diagram .hl-green { color: var(--green); }
+  .collab-diagram .hl-orange { color: var(--orange); }
+  .collab-diagram .hl-purple { color: var(--purple); }
+  .collab-diagram .hl-cyan { color: var(--cyan); }
+  .collab-diagram .dim { color: var(--text-dim); }
+
+  /* Footer */
+  .footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 20px 24px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: auto;
+  }
+
+  .footer span { color: var(--red); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .header h1 { font-size: 18px; }
+    .tab { padding: 8px 16px; font-size: 13px; }
+    .content { padding: 20px 16px 60px; }
+    .flow { flex-direction: column; gap: 0; }
+    .flow-arrow { transform: rotate(90deg); padding: 4px 0; }
+    .cmd-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <h1>Wellows Platform <span>Dev Guide</span></h1>
+    <p>Agents, skills, spec-driven development, and DevOps workflows</p>
+    <div class="tabs">
+      <div class="tab active" data-tab="agents">Agents & Skills</div>
+      <div class="tab" data-tab="sdd">SDD Feature Flow</div>
+      <div class="tab" data-tab="devops">DevOps & Branching</div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- TAB 1: AGENTS & SKILLS -->
+  <div class="tab-panel active" id="tab-agents">
+
+    <div class="section">
+      <div class="section-title">Agents</div>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+        Specialized AI personas that handle specific types of work. Click any agent to see details.
+      </p>
+
+      <div class="agent-grid">
+
+        <!-- Feature Planner -->
+        <div class="agent-card">
+          <div class="agent-header" onclick="toggleAgent(this)">
+            <div class="agent-badge badge-cyan">FP</div>
+            <div class="agent-info">
+              <div class="agent-name">Feature Planner <span class="model-tag">opus</span></div>
+              <div class="agent-desc">Plans cross-repo features with two plan-mode approval cycles. Creates STD-001 spec artifacts.</div>
+            </div>
+            <div class="agent-toggle">&#9662;</div>
+          </div>
+          <div class="agent-details">
+            <div class="detail-label">Skills</div>
+            <span class="skill-tag">feature-planner</span>
+            <span class="skill-tag">sdd</span>
+            <span class="skill-tag">codebase-researcher</span>
+            <div class="detail-label">What It Does</div>
+            <div class="detail-text">
+              <ul>
+                <li>Gathers requirements through interactive Q&A</li>
+                <li>Detects new feature vs modification of existing behavior</li>
+                <li>Delegates codebase research to both API and Frontend</li>
+                <li>Creates proposal.md, spec-delta.md, and tasks.md</li>
+                <li>Two approval gates: setup plan + feature plan</li>
+                <li>Auto-transitions SDD state to implementation</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Backend Engineer -->
+        <div class="agent-card">
+          <div class="agent-header" onclick="toggleAgent(this)">
+            <div class="agent-badge badge-green">BE</div>
+            <div class="agent-info">
+              <div class="agent-name">Backend Engineer <span class="model-tag">opus</span></div>
+              <div class="agent-desc">Implements API endpoints, business logic, database operations, and tests. Thin routers, fat services.</div>
+            </div>
+            <div class="agent-toggle">&#9662;</div>
+          </div>
+          <div class="agent-details">
+            <div class="detail-label">Skills</div>
+            <span class="skill-tag">backend-endpoint-builder</span>
+            <span class="skill-tag">backend-database-ops</span>
+            <div class="detail-label">Golden Rule</div>
+            <div class="detail-text">
+              <ul>
+                <li>Routers are thin: validate input, call service, return response</li>
+                <li>Services are fat: all business logic lives here</li>
+                <li>Models use db.flush() only, never commit</li>
+                <li>LLM calls are OUTSIDE database session blocks</li>
+                <li>Marks tasks in tasks.md as completed</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Frontend Engineer -->
+        <div class="agent-card">
+          <div class="agent-header" onclick="toggleAgent(this)">
+            <div class="agent-badge badge-green">FE</div>
+            <div class="agent-info">
+              <div class="agent-name">Frontend Engineer <span class="model-tag">opus</span></div>
+              <div class="agent-desc">Implements React components, pages, hooks, and API integration. Components render, hooks think, services fetch.</div>
+            </div>
+            <div class="agent-toggle">&#9662;</div>
+          </div>
+          <div class="agent-details">
+            <div class="detail-label">Skills</div>
+            <span class="skill-tag">frontend-component-builder</span>
+            <span class="skill-tag">frontend-api-integration</span>
+            <span class="skill-tag">frontend-state-management</span>
+            <div class="detail-label">Architecture</div>
+            <div class="detail-text">
+              <ul>
+                <li>Components render UI only, no business logic in JSX</li>
+                <li>Hooks manage state and side effects</li>
+                <li>Services handle API calls via apiHandler()</li>
+                <li>Server data in React Query, client state in Redux</li>
+                <li>No `any` types — TypeScript interfaces required</li>
+                <li>Marks tasks in tasks.md as completed</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Backend Database Engineer -->
+        <div class="agent-card">
+          <div class="agent-header" onclick="toggleAgent(this)">
+            <div class="agent-badge badge-blue">DB</div>
+            <div class="agent-info">
+              <div class="agent-name">Database Engineer <span class="model-tag">sonnet</span></div>
+              <div class="agent-desc">Schema design, query optimization, migrations, and performance tuning. MySQL, MongoDB, Redis.</div>
+            </div>
+            <div class="agent-toggle">&#9662;</div>
+          </div>
+          <div class="agent-details">
+            <div class="detail-label">Skills</div>
+            <span class="skill-tag">backend-database-ops</span>
+            <div class="detail-label">Databases</div>
+            <div class="detail-text">
+              <ul>
+                <li>MySQL — 61 SQLAlchemy models, Alembic migrations</li>
+                <li>MongoDB — Motor async client, document storage</li>
+                <li>Redis — Caching with TTL, session management</li>
+                <li>Marks tasks in tasks.md as completed</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Backend AI Integration Engineer -->
+        <div class="agent-card">
+          <div class="agent-header" onclick="toggleAgent(this)">
+            <div class="agent-badge badge-purple">AI</div>
+            <div class="agent-info">
+              <div class="agent-name">AI Integration Engineer <span class="model-tag">opus</span></div>
+              <div class="agent-desc">Multi-provider LLM orchestration. OpenAI, Claude, Gemini, Deepseek, Groq, Perplexity.</div>
+            </div>
+            <div class="agent-toggle">&#9662;</div>
+          </div>
+          <div class="agent-details">
+            <div class="detail-label">Skills</div>
+            <span class="skill-tag">backend-llm-integration</span>
+            <span class="skill-tag">backend-sqs-background-task</span>
+            <span class="skill-tag">backend-database-ops</span>
+            <div class="detail-label">Responsibilities</div>
+            <div class="detail-text">
+              <ul>
+                <li>Provider selection and fallback chains</li>
+                <li>Prompt engineering and structured outputs</li>
+                <li>Async LLM processing via SQS</li>
+                <li>Token budget and cost tracking</li>
+                <li>Marks tasks in tasks.md as completed</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- PR Reviewer -->
+        <div class="agent-card">
+          <div class="agent-header" onclick="toggleAgent(this)">
+            <div class="agent-badge badge-purple">PR</div>
+            <div class="agent-info">
+              <div class="agent-name">PR Reviewer <span class="model-tag">opus</span></div>
+              <div class="agent-desc">Unified code reviewer. Auto-detects scope from file paths. Every review has Backend + Frontend sections.</div>
+            </div>
+            <div class="agent-toggle">&#9662;</div>
+          </div>
+          <div class="agent-details">
+            <div class="detail-label">Skills</div>
+            <span class="skill-tag">backend-pr-review</span>
+            <span class="skill-tag">frontend-pr-review</span>
+            <div class="detail-label">How It Works</div>
+            <div class="detail-text">
+              <ul>
+                <li>Fetches all PR files with pagination (100 per page)</li>
+                <li>Classifies by path: apps/platform-api/ or apps/platform-frontend/</li>
+                <li>Always outputs both Backend Review and Frontend Review headings</li>
+                <li>Inactive scope section says "No files changed"</li>
+                <li>Posts review via gh pr review --comment (never approves/merges)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Codebase Researcher -->
+        <div class="agent-card">
+          <div class="agent-header" onclick="toggleAgent(this)">
+            <div class="agent-badge badge-orange">CR</div>
+            <div class="agent-info">
+              <div class="agent-name">Codebase Researcher <span class="model-tag">sonnet</span></div>
+              <div class="agent-desc">Deep-dives into backend or frontend. Traces code trails, maps dependencies, explains how things work.</div>
+            </div>
+            <div class="agent-toggle">&#9662;</div>
+          </div>
+          <div class="agent-details">
+            <div class="detail-label">Skills</div>
+            <span class="skill-tag">codebase-researcher</span>
+            <div class="detail-label">Research Types</div>
+            <div class="detail-text">
+              <ul>
+                <li>"How does X work?" — Code trail tracing</li>
+                <li>"Where is X?" — File and function location</li>
+                <li>"What breaks if I change X?" — Impact analysis</li>
+                <li>Auto-detects backend vs frontend from the question</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Docker Ops Engineer -->
+        <div class="agent-card">
+          <div class="agent-header" onclick="toggleAgent(this)">
+            <div class="agent-badge badge-blue">DO</div>
+            <div class="agent-info">
+              <div class="agent-name">Docker Ops Engineer <span class="model-tag">opus</span></div>
+              <div class="agent-desc">Container lifecycle, logs, database access, migrations, SQS queues, and troubleshooting.</div>
+            </div>
+            <div class="agent-toggle">&#9662;</div>
+          </div>
+          <div class="agent-details">
+            <div class="detail-label">Skills</div>
+            <span class="skill-tag">docker-ops</span>
+            <div class="detail-label">Operations</div>
+            <div class="detail-text">
+              <ul>
+                <li>Start/stop/restart Docker services</li>
+                <li>View and filter container logs</li>
+                <li>Access MySQL, MongoDB, Redis inside containers</li>
+                <li>Run Alembic migrations</li>
+                <li>Manage SQS queues and messages</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Browser Verification Engineer -->
+        <div class="agent-card">
+          <div class="agent-header" onclick="toggleAgent(this)">
+            <div class="agent-badge badge-orange">BV</div>
+            <div class="agent-info">
+              <div class="agent-name">Browser Verification Engineer <span class="model-tag">sonnet</span></div>
+              <div class="agent-desc">Tests features in Chrome against spec scenarios. Captures screenshots, routes failures to engineers.</div>
+            </div>
+            <div class="agent-toggle">&#9662;</div>
+          </div>
+          <div class="agent-details">
+            <div class="detail-label">Skills</div>
+            <span class="skill-tag">browser-verification</span>
+            <div class="detail-label">Process</div>
+            <div class="detail-text">
+              <ul>
+                <li>Reads [Frontend] and [Both] scenarios from spec-delta</li>
+                <li>Opens Chrome at localhost:5173</li>
+                <li>Navigates, clicks, fills forms, verifies outcomes</li>
+                <li>Takes before/after screenshots as evidence</li>
+                <li>UI failures -> Frontend Engineer</li>
+                <li>API failures -> Backend Engineer</li>
+                <li>Marks verification tasks in tasks.md</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Agent Collaboration -->
+    <div class="section">
+      <div class="section-title">How Agents Collaborate</div>
+      <div class="collab-diagram"><span class="hl-cyan">Feature Planner</span> <span class="dim">--creates--></span> Spec Artifacts (proposal, spec-delta, tasks)
+       <span class="dim">|</span>
+       <span class="dim">|--</span> <span class="hl-green">Backend Engineer</span> <span class="dim">--implements--></span> API Tasks
+       <span class="dim">|--</span> <span class="hl-green">Frontend Engineer</span> <span class="dim">--implements--></span> Frontend Tasks
+       <span class="dim">|</span>
+       <span class="dim">`--</span> <span class="hl-orange">Browser Verification</span> <span class="dim">--verifies--></span> [Frontend] & [Both] scenarios
+                <span class="dim">|</span>
+                <span class="dim">|--</span> Routes UI failures to <span class="hl-green">Frontend Engineer</span>
+                <span class="dim">`--</span> Routes API failures to <span class="hl-green">Backend Engineer</span>
+
+<span class="hl-purple">PR Reviewer</span> <span class="dim">--reviews--></span> Pull Requests (auto-detects scope)
+<span class="hl-orange">Codebase Researcher</span> <span class="dim">--answers--></span> "How does X work?" questions
+<span class="hl">Docker Ops</span> <span class="dim">--manages--></span> Dev environment</div>
+    </div>
+
+    <!-- Skills -->
+    <div class="section">
+      <div class="section-title">Skills (16 total)</div>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+        Knowledge modules loaded by agents. Some are user-invocable via slash commands.
+      </p>
+
+      <div class="section-subtitle">Backend</div>
+      <table class="skill-table">
+        <tr><th>Skill</th><th>Slash Command</th><th>Description</th></tr>
+        <tr>
+          <td class="name">backend-endpoint-builder</td>
+          <td class="cmd">/endpoint-builder</td>
+          <td class="desc">FastAPI layered architecture. Router -> Service -> Model patterns.</td>
+        </tr>
+        <tr>
+          <td class="name">backend-database-ops</td>
+          <td class="cmd">/database-ops</td>
+          <td class="desc">MySQL, MongoDB, Redis operations. Models, queries, transactions, caching.</td>
+        </tr>
+        <tr>
+          <td class="name">backend-llm-integration</td>
+          <td class="na">not invocable</td>
+          <td class="desc">Multi-provider LLM integration. Retry logic, structured outputs, tokens.</td>
+        </tr>
+        <tr>
+          <td class="name">backend-sqs-background-task</td>
+          <td class="na">not invocable</td>
+          <td class="desc">SQS producer/consumer setup. High-impact, requires manual approval.</td>
+        </tr>
+        <tr>
+          <td class="name">backend-pr-review</td>
+          <td class="cmd">/backend-pr-review</td>
+          <td class="desc">Backend PR review checklists. Architecture, security, performance.</td>
+        </tr>
+      </table>
+
+      <div class="section-subtitle">Frontend</div>
+      <table class="skill-table">
+        <tr><th>Skill</th><th>Slash Command</th><th>Description</th></tr>
+        <tr>
+          <td class="name">frontend-component-builder</td>
+          <td class="cmd">/component-builder</td>
+          <td class="desc">React component architecture. Pages, Components, Hooks, Services.</td>
+        </tr>
+        <tr>
+          <td class="name">frontend-api-integration</td>
+          <td class="cmd">/api-integration</td>
+          <td class="desc">APIHandler, Axios interceptors, JWT tokens, WebSocket, error handling.</td>
+        </tr>
+        <tr>
+          <td class="name">frontend-state-management</td>
+          <td class="cmd">/state-management</td>
+          <td class="desc">Redux Toolkit slices, React Query cache, state architecture decisions.</td>
+        </tr>
+        <tr>
+          <td class="name">frontend-pr-review</td>
+          <td class="cmd">/frontend-pr-review</td>
+          <td class="desc">Frontend PR review checklists. TypeScript, accessibility, components.</td>
+        </tr>
+      </table>
+
+      <div class="section-subtitle">Platform</div>
+      <table class="skill-table">
+        <tr><th>Skill</th><th>Slash Command</th><th>Description</th></tr>
+        <tr>
+          <td class="name">feature-planner</td>
+          <td class="cmd">/feature-planner</td>
+          <td class="desc">Cross-repo STD-001 planning. Requirements Q&A, artifact creation.</td>
+        </tr>
+        <tr>
+          <td class="name">sdd</td>
+          <td class="cmd">/sdd</td>
+          <td class="desc">SDD lifecycle: start, status, implement, complete.</td>
+        </tr>
+        <tr>
+          <td class="name">std-001-sdd</td>
+          <td class="na">context only</td>
+          <td class="desc">Constitutional rules for Spec-Driven Development.</td>
+        </tr>
+        <tr>
+          <td class="name">std-002-vkf</td>
+          <td class="cmd">/venture-foundation</td>
+          <td class="desc">Venture Knowledge Foundation. Constitution, specs, freshness tracking.</td>
+        </tr>
+        <tr>
+          <td class="name">codebase-researcher</td>
+          <td class="cmd">/codebase-researcher</td>
+          <td class="desc">Code trail tracing, dependency mapping, impact analysis.</td>
+        </tr>
+        <tr>
+          <td class="name">docker-ops</td>
+          <td class="cmd">/docker-ops</td>
+          <td class="desc">Container lifecycle, logs, database access, migrations, queues.</td>
+        </tr>
+        <tr>
+          <td class="name">browser-verification</td>
+          <td class="cmd">/browser-verification</td>
+          <td class="desc">Tests spec scenarios in Chrome, captures screenshots, routes failures.</td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- TAB 2: SDD FEATURE FLOW -->
+  <div class="tab-panel" id="tab-sdd">
+
+    <div class="section">
+      <div class="section-title">The Feature Flow</div>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="number">Step 1</div>
+          <div class="label">Idea</div>
+          <div class="sub">Backlog or direct</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="number">Step 2</div>
+          <div class="label">Spec</div>
+          <div class="sub">Proposal + Delta + Tasks</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="number">Step 3</div>
+          <div class="label">Build API</div>
+          <div class="sub">Backend Engineer</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="number">Step 4</div>
+          <div class="label">Build Frontend</div>
+          <div class="sub">Frontend Engineer</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="number">Step 5</div>
+          <div class="label">Verify</div>
+          <div class="sub">Browser testing</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="number">Step 6</div>
+          <div class="label">Archive</div>
+          <div class="sub">Merge + close</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How to Start -->
+    <div class="section">
+      <div class="section-title">How to Create a Feature</div>
+
+      <div class="info-box green">
+        <strong>Recommended:</strong> Tell Claude what you want to build. The Feature Planner agent activates automatically and walks you through requirements, research, and artifact creation with two approval checkpoints.
+      </div>
+
+      <div class="section-subtitle">Interactive (Feature Planner)</div>
+      <div class="detail-text" style="margin-bottom: 16px;">
+        <ul style="list-style: none; padding: 0;">
+          <li style="padding: 6px 0; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: var(--accent);">1.</span> Describe your feature to Claude</li>
+          <li style="padding: 6px 0; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: var(--accent);">2.</span> <strong>Cycle 1:</strong> Agent creates SDD state + change directory, enters plan mode for proposal gate</li>
+          <li style="padding: 6px 0; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: var(--accent);">3.</span> You approve the setup plan</li>
+          <li style="padding: 6px 0; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: var(--accent);">4.</span> <strong>Cycle 2:</strong> Agent asks questions, researches both codebases, presents findings in plan mode</li>
+          <li style="padding: 6px 0; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: var(--accent);">5.</span> You approve the feature plan</li>
+          <li style="padding: 6px 0; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: var(--accent);">6.</span> Agent writes proposal.md, spec-delta.md, tasks.md and transitions to implementation</li>
+          <li style="padding: 6px 0; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: var(--accent);">7.</span> Handoff: agent tells you which engineer agents to use next</li>
+        </ul>
+      </div>
+
+      <div class="section-subtitle">Manual</div>
+      <div class="cmd-grid">
+        <div class="cmd-card">
+          <div class="cmd-name">cp -r changes/.templates changes/{slug}</div>
+          <div class="cmd-desc">Copy templates to start a new change</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">/sdd start {slug}</div>
+          <div class="cmd-desc">Or use the SDD command to set up the change directory and state</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spec Artifacts -->
+    <div class="section">
+      <div class="section-title">Spec Artifacts</div>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+        Every change produces four files in <code style="color: var(--accent); background: var(--surface-3); padding: 1px 5px; border-radius: 3px;">changes/{slug}/</code>
+      </p>
+
+      <div class="cmd-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+        <div class="cmd-card">
+          <div class="cmd-name">config.yaml</div>
+          <div class="cmd-desc">Metadata: name, author, status, target spec, repos affected</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">proposal.md</div>
+          <div class="cmd-desc">What and why. Problem, solution, scope, acceptance criteria.</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">spec-delta.md</div>
+          <div class="cmd-desc">Behavior changes in Given/When/Then. Tagged [API], [Frontend], or [Both].</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">tasks.md</div>
+          <div class="cmd-desc">Implementation checklist. Grouped by API Tasks and Frontend Tasks.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SDD Commands -->
+    <div class="section">
+      <div class="section-title">SDD Lifecycle Commands</div>
+      <div class="cmd-grid">
+        <div class="cmd-card">
+          <div class="cmd-name">/sdd start {slug}</div>
+          <div class="cmd-desc">Creates changes/{slug}/ with templates. Sets SDD state to <code style="color: var(--cyan);">proposal</code>.</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">/sdd status</div>
+          <div class="cmd-desc">Shows current cycle, artifact status, task progress (done vs pending).</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">/sdd implement</div>
+          <div class="cmd-desc">Validates artifacts, transitions to <code style="color: var(--green);">implementation</code>. Shows handoff.</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">/sdd complete {slug}</div>
+          <div class="cmd-desc">Moves to archive/, updates history, commits. Run after PR merges.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Implementation Order -->
+    <div class="section">
+      <div class="section-title">Implementation Order</div>
+      <div class="info-box">
+        <strong>STD-001 Rule:</strong> Order by dependency. Implement dependencies first, then verify together.
+      </div>
+
+      <div class="flow" style="padding: 16px 0;">
+        <div class="flow-step" style="border-color: var(--green);">
+          <div class="number" style="color: var(--green);">First</div>
+          <div class="label">Backend Engineer</div>
+          <div class="sub">API Tasks from tasks.md</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step" style="border-color: var(--green);">
+          <div class="number" style="color: var(--green);">Second</div>
+          <div class="label">Frontend Engineer</div>
+          <div class="sub">Frontend Tasks (depends on API)</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step" style="border-color: var(--orange);">
+          <div class="number" style="color: var(--orange);">Optional</div>
+          <div class="label">Browser Verification</div>
+          <div class="sub">Tests in Chrome</div>
+        </div>
+      </div>
+
+      <div class="info-box orange">
+        <strong>Task tracking:</strong> Engineer agents mark tasks as <code style="color: var(--green);">[x]</code> in tasks.md as they complete them. Run <code style="color: var(--accent);">/sdd status</code> to see progress.
+      </div>
+    </div>
+
+    <!-- When You Need a Spec -->
+    <div class="section">
+      <div class="section-title">When Do You Need a Spec?</div>
+      <table class="decision-table">
+        <tr><th>Situation</th><th>Spec?</th><th>Why</th></tr>
+        <tr><td>New feature</td><td class="yes">Yes</td><td>Behavior needs to be defined</td></tr>
+        <tr><td>Changing existing behavior</td><td class="yes">Yes</td><td>Document what's different</td></tr>
+        <tr><td>Breaking API changes</td><td class="yes">Yes</td><td>Frontend needs to know</td></tr>
+        <tr><td>Database schema changes</td><td class="yes">Yes</td><td>Structural changes need tracking</td></tr>
+        <tr><td>Security-related changes</td><td class="yes">Yes</td><td>High-risk needs review</td></tr>
+        <tr><td>Bug fix (restoring behavior)</td><td class="no">No</td><td>Spec already describes correct behavior</td></tr>
+        <tr><td>Refactoring (no behavior change)</td><td class="no">No</td><td>Users don't see anything different</td></tr>
+        <tr><td>Dependency/config updates</td><td class="no">No</td><td>No behavior change</td></tr>
+      </table>
+
+      <div class="info-box" style="margin-top: 16px;">
+        <strong>Rule of thumb:</strong> If a user would notice the change, write a spec. If they wouldn't, skip it.
+      </div>
+    </div>
+
+    <!-- Commit Prefixes -->
+    <div class="section">
+      <div class="section-title">Commit Prefixes</div>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+        Always commit spec before code. The <span class="prefix prefix-spec">[spec]</span> commit goes first, then <span class="prefix prefix-impl">[impl]</span>.
+      </p>
+      <table class="decision-table">
+        <tr><th>Prefix</th><th>When</th></tr>
+        <tr><td><span class="prefix prefix-spec">[spec]</span></td><td>Spec artifacts committed (proposal, spec-delta, tasks)</td></tr>
+        <tr><td><span class="prefix prefix-impl">[impl]</span></td><td>Feature implementation code</td></tr>
+        <tr><td><span class="prefix prefix-fix">[fix]</span></td><td>Bug fix restoring specified behavior</td></tr>
+        <tr><td><span class="prefix prefix-refactor">[refactor]</span></td><td>Code restructuring with no behavior change</td></tr>
+        <tr><td><span class="prefix prefix-archive">[archive]</span></td><td>Moving completed change to archive/</td></tr>
+        <tr><td><span class="prefix prefix-chore">[chore]</span></td><td>Dependencies, config, docs, CI/CD</td></tr>
+        <tr><td><span class="prefix prefix-feat">[feat]</span></td><td>New tooling, agents, skills, or infrastructure</td></tr>
+      </table>
+    </div>
+
+    <!-- Directory Structure -->
+    <div class="section">
+      <div class="section-title">Directory Structure</div>
+      <div class="collab-diagram"><span class="hl">wellows-platform/</span>
+  <span class="hl-cyan">specs/</span>
+    constitution.md               <span class="dim"># Platform-wide immutable principles</span>
+    features/                     <span class="dim"># Canonical feature specs (source of truth)</span>
+      {feature}/spec.md
+  <span class="hl-green">changes/</span>
+    .templates/                   <span class="dim"># Copy these to start a new change</span>
+    {change-name}/                <span class="dim"># Active change proposals</span>
+      config.yaml
+      proposal.md
+      spec-delta.md
+      tasks.md
+  <span class="hl-orange">backlog/</span>
+    items.yaml                    <span class="dim"># Quick idea parking lot</span>
+  <span class="hl-purple">archive/</span>
+    {completed-change}/           <span class="dim"># Historical record</span></div>
+    </div>
+
+  </div>
+
+  <!-- TAB 3: DEVOPS & BRANCHING -->
+  <div class="tab-panel" id="tab-devops">
+
+    <div class="section">
+      <div class="section-title">Branching Strategy</div>
+      <div class="info-box">
+        <strong>Coming soon.</strong> This section will cover branch naming conventions, feature branch workflow, PR flow, and environment branch management.
+      </div>
+
+      <div class="cmd-grid" style="margin-top: 16px;">
+        <div class="cmd-card" style="border-color: var(--border); opacity: 0.5;">
+          <div class="cmd-name">Branch Naming</div>
+          <div class="cmd-desc">Conventions for feature, fix, refactor, and release branches.</div>
+        </div>
+        <div class="cmd-card" style="border-color: var(--border); opacity: 0.5;">
+          <div class="cmd-name">PR Workflow</div>
+          <div class="cmd-desc">From feature branch to code review to merge.</div>
+        </div>
+        <div class="cmd-card" style="border-color: var(--border); opacity: 0.5;">
+          <div class="cmd-name">Environment Branches</div>
+          <div class="cmd-desc">How UAT, staging, and production branches are managed.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Deployment Pipeline</div>
+      <div class="info-box">
+        <strong>Coming soon.</strong> This section will cover the deployment flow from local development to production, including UAT and staging environments.
+      </div>
+
+      <div class="flow" style="opacity: 0.5;">
+        <div class="flow-step">
+          <div class="number">Local</div>
+          <div class="label">Development</div>
+          <div class="sub">Docker Compose</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="number">PR</div>
+          <div class="label">Code Review</div>
+          <div class="sub">CI checks</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="number">UAT</div>
+          <div class="label">Testing</div>
+          <div class="sub">QA validation</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="number">Staging</div>
+          <div class="label">Pre-Prod</div>
+          <div class="sub">Final check</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="number">Prod</div>
+          <div class="label">Production</div>
+          <div class="sub">Live</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Environment Map</div>
+      <div class="info-box">
+        <strong>Coming soon.</strong> This section will map branches to environments, URLs, and deployment triggers.
+      </div>
+
+      <table class="decision-table" style="opacity: 0.5;">
+        <tr><th>Environment</th><th>Branch</th><th>URL</th><th>Deploys On</th></tr>
+        <tr><td>Development</td><td style="color: var(--accent);">feature/*</td><td style="color: var(--text-dim);">localhost</td><td style="color: var(--text-dim);">Manual</td></tr>
+        <tr><td>UAT</td><td style="color: var(--accent);">*-uat</td><td style="color: var(--text-dim);">TBD</td><td style="color: var(--text-dim);">PR merge</td></tr>
+        <tr><td>Staging</td><td style="color: var(--accent);">*-stag</td><td style="color: var(--text-dim);">TBD</td><td style="color: var(--text-dim);">PR merge</td></tr>
+        <tr><td>Production</td><td style="color: var(--accent);">main</td><td style="color: var(--text-dim);">TBD</td><td style="color: var(--text-dim);">PR merge</td></tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<div class="section" style="max-width: 1100px; margin: 0 auto; padding: 0 24px 32px;">
+  <div class="section-title">Reference</div>
+  <a href="https://hub.dsrpt.dev/standards/std-001-spec-driven-development/" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 14px;">STD-001: Spec-Driven Development — Disrupt Hub</a>
+</div>
+
+<div class="footer">
+  Created with <span>&hearts;</span> by Team Wellows Engineering
+</div>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // Agent card toggle
+  function toggleAgent(header) {
+    header.parentElement.classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>
